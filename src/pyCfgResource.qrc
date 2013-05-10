@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/pyCfg">
+        <file alias="pycfgicon">preferences-desktop.png</file>
+        <file alias="false">false.png</file>
+        <file alias="true">true.png</file>
+    </qresource>
+</RCC>
