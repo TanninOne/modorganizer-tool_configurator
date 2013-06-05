@@ -3,5 +3,7 @@
         <file alias="pycfgicon">preferences-desktop.png</file>
         <file alias="false">false.png</file>
         <file alias="true">true.png</file>
+        <file alias="modified">not-synchronized.png</file>
+        <file alias="empty">empty.png</file>
     </qresource>
 </RCC>

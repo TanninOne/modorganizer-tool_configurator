@@ -3,7 +3,7 @@ import sys
 import json
 import ConfigParser
 from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import Qt,  pyqtWrapperType
+from PyQt4.QtCore import Qt,  pyqtWrapperType,  pyqtSlot,  pyqtSignal
 
 if not "mobase" in sys.modules:
     import mock_mobase as mobase
@@ -31,6 +31,9 @@ pair as the key's value (values become dictionaries)."""
   
     def __setitem__(self, key, value):
         return dict.__setitem__(self, key.lower(), {'key': key, 'val': value})
+ 
+    def updateKey(self,  key):
+        dict.__getitem__(self,  key.lower())['key'] = key
  
     def get(self, key, default=None):
         try:
@@ -69,10 +72,10 @@ pair as the key's value (values become dictionaries)."""
 
 
 class MainWindow(QtGui.QDialog):
+    saveSettings = pyqtSignal(dict)
     def __init__(self,  settings,  parent = None):
         super(MainWindow,  self).__init__(parent)
         self.__settings = settings
-
         from pyCfgDialog import Ui_PyCfgDialog
 
         self.__ui = Ui_PyCfgDialog()
@@ -82,9 +85,30 @@ class MainWindow(QtGui.QDialog):
 
         self.__updateCategories()
         self.__ui.categorySelection.currentIndexChanged[int].connect(self.__sectionChanged)
-        self.__ui.advancedBtn.clicked.connect(self.__advancedClicked)
+        self.__ui.advancedButton.clicked.connect(self.__advancedClicked)
+        self.__ui.saveButton.clicked.connect(self.__save)
+        #self.__ui.settingsTree.header().setMinimumSectionSize(200)
+        self.__ui.settingsTree.header().setResizeMode(0,   QtGui.QHeaderView.Interactive)
         self.__ui.settingsTree.header().setResizeMode(1,  QtGui.QHeaderView.Stretch)
         self.__lastSelectedCategory = ""
+        self.__ui.closeButton.clicked.connect(self.close)
+
+    def closeEvent(self,  event):
+        if self.__ui.saveButton.isEnabled():
+            res = QtGui.QMessageBox.question(self,  "Unsaved changes", 
+                            "There are unsaved changes. Do you want to save before closing the dialog?", 
+                            QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel, 
+                            QtGui.QMessageBox.Cancel)
+            if res == QtGui.QMessageBox.Save:
+                self.__save()
+            elif res == QtGui.QMessageBox.Cancel:
+                event.ignore()
+        else:
+            super(MainWindow,  self).__init__(event)
+
+    def __save(self):
+        self.saveSettings.emit(self.__settings)
+        self.__ui.saveButton.setEnabled(False)
 
     def __advancedClicked(self):
         self.sender().setText("Advanced" if self.sender().isChecked() else "Basic")
@@ -93,10 +117,35 @@ class MainWindow(QtGui.QDialog):
         if newIdx != -1:
             self.__ui.categorySelection.setCurrentIndex(newIdx)
 
+    def __valueChanged(self,  sender,  value):
+        section = str(self.__ui.categorySelection.currentText())
+        itemName = sender.property("key").toString()
+        setting = self.__settings[section][str(itemName)]
+        setting["value"] = value
+        matches = self.__ui.settingsTree.findItems(itemName,  QtCore.Qt.MatchExactly)
+        item = matches[0]
+        self.__updateIcon(item)
+
+    def __updateIcon(self,  item):
+        setting = self.__settings[self.__lastSelectedCategory][str(item.text(0))]
+        saved = setting.get("saved",  setting["default"])
+        if  saved != setting["value"]:
+            item.setIcon(0,  QtGui.QIcon(":/pyCfg/modified"))
+            self.__ui.saveButton.setEnabled(True)
+        else:
+            item.setIcon(0,  QtGui.QIcon(":/pyCfg/empty"))
+
+    def __valueChangedIndex(self,  value):
+        # odd problem: can't connect to the slot with text-parameter
+        self.__valueChanged(self.sender(),  str(self.sender().itemText(value)))
+    
+    def __sliderChanged(self,  value):
+        self.__valueChanged(self.sender(),  value)
+
     def __updateCategories(self):
         self.__ui.categorySelection.clear()
         self.__ui.categorySelection.addItem("")
-        advanced = self.__ui.advancedBtn.isChecked()
+        advanced = self.__ui.advancedButton.isChecked()
         for cat in self.__settings.keys():
             display = advanced
             if not display:
@@ -112,35 +161,49 @@ class MainWindow(QtGui.QDialog):
         col = QtGui.QColorDialog.getColor(self.sender().palette().color(QtGui.QPalette.ButtonText))
         palette = self.sender().palette()
         palette.setColor(QtGui.QPalette.ButtonText,  col)
+        colStr = str(col.red()) + "," + str(col.green()) + "," + str(col.blue())
+        print(colStr)
+        self.__valueChanged(self.sender(),  colStr) # xxx
         self.sender().setPalette(palette)
 
     def __boolClicked(self):
         if self.sender().isChecked() :
             self.sender().setText("true")
+            self.__valueChanged(self.sender(),  True)
             self.sender().setIcon(QtGui.QIcon(":/pyCfg/true"))
         else:
             self.sender().setText("false")
+            self.__valueChanged(self.sender(),  False)
             self.sender().setIcon(QtGui.QIcon(":/pyCfg/false"))
+
+    def __editBoxChanged(self):
+        self.__valueChanged(self.sender(),  str(self.sender().text()))
+
+    def __floatBoxChanged(self,  value):
+        self.__valueChanged(self.sender(),  value)
 
     def __genSelectionEntry(self,  key,  setting):
         newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
         selectionWidget = QtGui.QComboBox(self.__ui.settingsTree)
+        selectionWidget.setProperty("key",  key)
         for val in setting["values"]:
             selectionWidget.addItem(str(val),  val)
             if setting["value"] == val:
                 selectionWidget.setCurrentIndex(selectionWidget.count() - 1)
 
         self.__ui.settingsTree.setItemWidget(newItem,  1,  selectionWidget)
+        selectionWidget.currentIndexChanged[int].connect(self.__valueChangedIndex)
         return newItem
 
     def __genBooleanEntry(self,  key,  setting):
         newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
         enableBtn = QtGui.QPushButton("true" if setting["value"] else "false",  self.__ui.settingsTree)
+        enableBtn.setProperty("key",  key)
         enableBtn.setCheckable(True)
         enableBtn.setChecked(setting["value"])
         enableBtn.setIcon(QtGui.QIcon(":/pyCfg/true") if setting["value"] else QtGui.QIcon(":/pyCfg/false"))
-        enableBtn.clicked.connect(self.__boolClicked)
         self.__ui.settingsTree.setItemWidget(newItem,  1,   enableBtn)
+        enableBtn.clicked.connect(self.__boolClicked)
         return newItem
 
     def __genDoubleEditEntry(self,  key,  setting):
@@ -151,16 +214,19 @@ class MainWindow(QtGui.QDialog):
         else:
             editWidget.setRange(-sys.float_info.max,  sys.float_info.max)
         editWidget.setSingleStep(setting.get("step",  1.0))
+        editWidget.setProperty("key",  key)
         editWidget.setValue(setting["value"])
+        editWidget.valueChanged[float].connect(self.__floatBoxChanged)
         self.__ui.settingsTree.setItemWidget(newItem,  1,   editWidget)
         return newItem
 
-    def __genSlider(self,  range,  step,  value):
+    def __genSlider(self,  range,  step,  key,  value):
             newWidget = QtGui.QWidget(self.__ui.settingsTree)
             layout = QtGui.QHBoxLayout(newWidget)
             layout.setStretch(2,  1)
             slider = QtGui.QSlider(Qt.Horizontal,  newWidget)
             spin = QtGui.QSpinBox(self.__ui.settingsTree)
+            slider.setProperty("key",  key)
             slider.setRange(range["lower"],  range["upper"])
             spin.setRange(range["lower"],  range["upper"])
             slider.setSingleStep(step)
@@ -173,35 +239,42 @@ class MainWindow(QtGui.QDialog):
             slider.valueChanged.connect(spin.setValue)
             spin.valueChanged.connect(slider.setValue)
             newWidget.setLayout(layout)
+            slider.valueChanged.connect(self.__sliderChanged) # xxx
             return newWidget
 
     def __genIntEditEntry(self,  key,  setting):
         newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
         if "range" in setting:
-            newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  setting["value"])
+            newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  str(key),  setting["value"])
         else:
             newWidget = QtGui.QSpinBox(self.__ui.settingsTree)
             newWidget.setRange(-sys.maxint,  sys.maxint)
             newWidget.setSingleStep(setting.get("step",  1))
+            newWidget.setProperty("key",  key)
             newWidget.setValue(setting["value"])
+            newWidget.valueChanged.connect(self.__sliderChanged) # xxx
         self.__ui.settingsTree.setItemWidget(newItem,  1,   newWidget)
         return newItem
 
     def __genUnsignedEditEntry(self,  key,  setting):
         newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
         if "range" in setting:
-            newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  setting["value"])
+            newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  key,  setting["value"])
         else:
             newWidget = QtGui.QSpinBox(self.__ui.settingsTree)
             newWidget.setRange(0,   sys.maxint)
             newWidget.setSingleStep(setting.get("step",  1))
+            newWidget.setProperty("key",  key)
             newWidget.setValue(setting["value"])
+            newWidget.valueChanged.connect(self.__sliderChanged) # xxx
         self.__ui.settingsTree.setItemWidget(newItem,  1,   newWidget)
         return newItem
 
     def __genEditEntry(self,  key,  setting):
         newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
         editBox = QtGui.QLineEdit(str(setting["value"]),  self.__ui.settingsTree)
+        editBox.setProperty("key",  key)
+        editBox.editingFinished.connect(self.__editBoxChanged)  # xxx
         self.__ui.settingsTree.setItemWidget(newItem,  1,   editBox)
 
         return newItem
@@ -220,6 +293,7 @@ class MainWindow(QtGui.QDialog):
         font = colorBtn.font()
         font.setBold(True)
         colorBtn.setFont(font)
+        colorBtn.setProperty("key",  key)
         colorBtn.clicked.connect(self.__rgbClicked)
         self.__ui.settingsTree.setItemWidget(newItem,  1,   colorBtn)
         return newItem
@@ -250,9 +324,10 @@ class MainWindow(QtGui.QDialog):
         self.__lastSelectedCategory = category
         for settingKey in sorted(self.__settings[category].keys(),  key=lambda setKey: setKey[1:]):
             setting = self.__settings[category][settingKey]
-            if not self.__ui.advancedBtn.isChecked() and not "basic" in setting.get("flags",  []):
+            if not self.__ui.advancedButton.isChecked() and not "basic" in setting.get("flags",  []):
                 continue
             newItem = self.__addSetting(settingKey,  setting)
+            self.__updateIcon(newItem)
             if "description" in setting:
                 newItem.setToolTip(0,  setting["description"])
             newItem.setToolTip(1,  "Default: " + str(setting["default"]))
@@ -266,7 +341,6 @@ class MainWindow(QtGui.QDialog):
 
 class IniEdit(mobase.IPluginTool):
     def init(self, organizer):
-        sys.path.append(organizer.pluginDataPath())
         import pyCfgResource_rc
 
         self.__organizer = organizer
@@ -322,17 +396,21 @@ class IniEdit(mobase.IPluginTool):
     def __filteredSettings(self):
         newSettings = CaselessDict()
         gameName = str(self.__organizer.gameInfo().type())
+        
+        iniFiles = self.__iniFiles()
+        
         for sectionKey in self.__settings.keys():
             section = self.__settings[sectionKey]
             filteredSection = CaselessDict()
             for key,  setting in section.iteritems():
+                setting["value"] = setting["default"]   
+                setting["file"] = iniFiles[1] if "prefs" in setting.get("flags",  []) else iniFiles[0]
                 if "hidden" in setting.get("flags",  []):
                     # set to hidden
                     continue
                 if "games" in setting and not gameName in setting["games"]:
                     # not for this game
                     continue
-                setting["value"] = setting["default"]
                 filteredSection[str(key)] = setting
             if len(filteredSection) > 0:
                 newSettings[sectionKey] = filteredSection
@@ -341,10 +419,13 @@ class IniEdit(mobase.IPluginTool):
     def updateSettings(self,  settings,  file):
         parser = ConfigParser.SafeConfigParser()
         parser.optionxform = str
-        parser.read(file)
+        parser.read(self.__organizer.profilePath() + "/" + file)
         for section in parser.sections():
             if not section in settings:
                 settings[section] = CaselessDict()
+            else:
+                settings.updateKey(section)
+
             for setting in parser.items(section):
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1]
@@ -355,15 +436,50 @@ class IniEdit(mobase.IPluginTool):
                 elif setting[0][0] == 'f':
                     value = float(value)
                 newData["value"] = value
+                newData["saved"] = value
+                newData["file"] = file
                 if not "default" in newData:
                     newData["default"] = value
                 settings[section][str(setting[0])] = newData
 
+    def __save(self,  settings):
+        iniFiles = {}
+        for fileName in self.__iniFiles():
+            parser = ConfigParser.SafeConfigParser()
+            parser.optionxform = str
+            parser.read(self.__organizer.profilePath() + "/" + fileName)
+            iniFiles[fileName]  = parser
+
+        count = 0
+        for sectionkey, section in settings.iteritems():
+            count += 1
+            for settingkey,  setting in section.iteritems():
+                if setting["value"] != setting.get("saved",  setting["default"]):
+                    print("saving " + sectionkey + "." + settingkey + " = " + str(setting["value"]))
+                    print(str(setting.get("saved",  "not saved")) + " - " + str(setting.get("default",  "no default")))
+                    try:
+                        iniFiles[setting["file"]].add_section(sectionkey)
+                    except ConfigParser.DuplicateSectionError:
+                        pass
+
+                    if type(setting["value"]) == bool:
+                        iniFiles[setting["file"]].set(sectionkey,  settingkey,  '1' if setting["value"] else '0')
+                    else:
+                        iniFiles[setting["file"]].set(sectionkey,  settingkey,  str(setting["value"]))
+                    setting["saved"] = setting["value"]
+
+        for fileName,  data in iniFiles.iteritems():
+            out = open(self.__organizer.profilePath() + "/" + fileName,  'w')
+            data.write(out)
+            out.close()
+
     def display(self):
         settings = self.__filteredSettings()
         for iniFile in self.__iniFiles():
-            self.updateSettings(settings,  self.__organizer.profilePath() + "/" + iniFile)
+            self.updateSettings(settings,  iniFile)
+
         win = MainWindow(settings)
+        win.saveSettings.connect(self.__save)
         win.exec_()
 
 def createPlugin():

@@ -365,6 +365,7 @@
   "fAudioMasterVolume" : {
     "default" : 1.000000,
     "flags" : [ "basic", "prefs" ],
+    "step" : 0.1,
     "range" : {
       "lower" : 0.0,
       "upper" : 10.0
@@ -374,6 +375,7 @@
   "fVal0" : {
     "default" : 1.000000,
     "flags" : [ "basic", "prefs" ],
+    "step" : 0.1,
     "range" : {
       "lower" : 0.0,
       "upper" : 10.0
@@ -383,6 +385,7 @@
   "fVal1" : {
     "default" : 1.000000,
     "flags" : [ "basic", "prefs" ],
+    "step" : 0.1,
     "range" : {
       "lower" : 0.0,
       "upper" : 10.0
@@ -392,6 +395,7 @@
   "fVal2" : {
     "default" : 1.000000,
     "flags" : [ "basic", "prefs" ],
+    "step" : 0.1,
     "range" : {
       "lower" : 0.0,
       "upper" : 10.0
@@ -401,6 +405,7 @@
   "fVal3" : {
     "default" : 1.000000,
     "flags" : [ "basic", "prefs" ],
+    "step" : 0.1,
     "range" : {
       "lower" : 0.0,
       "upper" : 10.0
@@ -1970,7 +1975,7 @@
     "default" : 1,
     "flags" : [ "basic" ],
     "range" : { "lower" : 0, "upper" : 1 },
-    "description" : "Disable to disable an engine-specific vsync-implementation. May reduce mouse lag and increase fps. May cause visual glitches"
+    "description" : "enable or disable an engine-specific vsync-implementation. May reduce mouse lag and increase fps. May cause visual glitches."
   },
   "iScreenShotIndex" : {
     "default" : 0,
@@ -3704,7 +3709,10 @@
   },
   "fHUDOpacity" : {
     "default" : 1.000000,
-    "flags" : [ "prefs", "basic" ]
+    "description" : "Opacity of the HUD. Reduce for a transparent hud.",
+    "flags" : [ "prefs", "basic" ],
+    "range" : { "lower" : 0.0, "upper" : 1.0 },
+    "step" : 0.1
   },
   "fLowPerfCombatantVoiceDistance" : {
     "default" : 1000.000000

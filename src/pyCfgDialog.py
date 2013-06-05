@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'C:/Users/Tannin/Documents/Projects/modorganizer-sf/source/plugins/pyniEdit/pyCfgDialog.ui'
 #
-# Created: Thu May 09 15:13:18 2013
+# Created: Tue Jun 04 14:58:07 2013
 #      by: PyQt4 UI code generator 4.10
 #
 # WARNING! All changes made in this file will be lost!
@@ -26,7 +26,7 @@ except AttributeError:
 class Ui_PyCfgDialog(object):
     def setupUi(self, PyCfgDialog):
         PyCfgDialog.setObjectName(_fromUtf8("PyCfgDialog"))
-        PyCfgDialog.resize(625, 435)
+        PyCfgDialog.resize(625, 503)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/pyCfg/pycfgicon")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         PyCfgDialog.setWindowIcon(icon)
@@ -39,15 +39,15 @@ class Ui_PyCfgDialog(object):
         self.horizontalLayout.addWidget(self.categorySelection)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
-        self.advancedBtn = QtGui.QPushButton(PyCfgDialog)
+        self.advancedButton = QtGui.QPushButton(PyCfgDialog)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.advancedBtn.sizePolicy().hasHeightForWidth())
-        self.advancedBtn.setSizePolicy(sizePolicy)
-        self.advancedBtn.setCheckable(True)
-        self.advancedBtn.setObjectName(_fromUtf8("advancedBtn"))
-        self.horizontalLayout.addWidget(self.advancedBtn)
+        sizePolicy.setHeightForWidth(self.advancedButton.sizePolicy().hasHeightForWidth())
+        self.advancedButton.setSizePolicy(sizePolicy)
+        self.advancedButton.setCheckable(True)
+        self.advancedButton.setObjectName(_fromUtf8("advancedButton"))
+        self.horizontalLayout.addWidget(self.advancedButton)
         self.horizontalLayout.setStretch(0, 1)
         self.horizontalLayout.setStretch(1, 1)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -56,20 +56,34 @@ class Ui_PyCfgDialog(object):
         self.settingsTree.setRootIsDecorated(False)
         self.settingsTree.setColumnCount(2)
         self.settingsTree.setObjectName(_fromUtf8("settingsTree"))
-        self.settingsTree.headerItem().setText(0, _fromUtf8("1"))
-        self.settingsTree.headerItem().setText(1, _fromUtf8("2"))
-        self.settingsTree.header().setVisible(False)
+        self.settingsTree.headerItem().setText(0, _fromUtf8("Key"))
+        self.settingsTree.headerItem().setText(1, _fromUtf8("Value"))
+        self.settingsTree.header().setVisible(True)
         self.settingsTree.header().setDefaultSectionSize(270)
         self.settingsTree.header().setMinimumSectionSize(20)
         self.settingsTree.header().setStretchLastSection(False)
         self.verticalLayout.addWidget(self.settingsTree)
+        self.horizontalLayout_2 = QtGui.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_2.addItem(spacerItem1)
+        self.saveButton = QtGui.QPushButton(PyCfgDialog)
+        self.saveButton.setEnabled(False)
+        self.saveButton.setObjectName(_fromUtf8("saveButton"))
+        self.horizontalLayout_2.addWidget(self.saveButton)
+        self.closeButton = QtGui.QPushButton(PyCfgDialog)
+        self.closeButton.setObjectName(_fromUtf8("closeButton"))
+        self.horizontalLayout_2.addWidget(self.closeButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.retranslateUi(PyCfgDialog)
         QtCore.QMetaObject.connectSlotsByName(PyCfgDialog)
 
     def retranslateUi(self, PyCfgDialog):
         PyCfgDialog.setWindowTitle(_translate("PyCfgDialog", "Configurator", None))
-        self.advancedBtn.setText(_translate("PyCfgDialog", "Basic", None))
+        self.advancedButton.setText(_translate("PyCfgDialog", "Basic", None))
+        self.saveButton.setText(_translate("PyCfgDialog", "Save", None))
+        self.closeButton.setText(_translate("PyCfgDialog", "Close", None))
 
 import pyCfgResource_rc
 
