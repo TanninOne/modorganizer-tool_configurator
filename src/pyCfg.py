@@ -266,7 +266,7 @@ class MainWindow(QtGui.QDialog):
             newWidget.setSingleStep(setting.get("step",  1))
             newWidget.setProperty("key",  key)
             newWidget.setValue(setting["value"])
-            newWidget.valueChanged.connect(self.__sliderChanged) # xxx
+            newWidget.valueChanged.connect(self.__sliderChanged)
         self.__ui.settingsTree.setItemWidget(newItem,  1,   newWidget)
         return newItem
 
@@ -274,7 +274,8 @@ class MainWindow(QtGui.QDialog):
         newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
         editBox = QtGui.QLineEdit(str(setting["value"]),  self.__ui.settingsTree)
         editBox.setProperty("key",  key)
-        editBox.editingFinished.connect(self.__editBoxChanged)  # xxx
+        editBox.editingFinished.connect(self.__editBoxChanged)
+        # editBox.textEdited.connect(self.__editBoxChanged) this would be better but crashes for unknown reasons
         self.__ui.settingsTree.setItemWidget(newItem,  1,   editBox)
 
         return newItem
@@ -430,7 +431,7 @@ class IniEdit(mobase.IPluginTool):
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1]
                 if setting[0][0] == 'b':
-                    value = bool(value)
+                    value = True if value == "1" else False
                 elif setting[0][0] == 'i' or setting[0][0] == 'u':
                     value = int(value)
                 elif setting[0][0] == 'f':
@@ -455,8 +456,6 @@ class IniEdit(mobase.IPluginTool):
             count += 1
             for settingkey,  setting in section.iteritems():
                 if setting["value"] != setting.get("saved",  setting["default"]):
-                    print("saving " + sectionkey + "." + settingkey + " = " + str(setting["value"]))
-                    print(str(setting.get("saved",  "not saved")) + " - " + str(setting.get("default",  "no default")))
                     try:
                         iniFiles[setting["file"]].add_section(sectionkey)
                     except ConfigParser.DuplicateSectionError:
