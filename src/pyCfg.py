@@ -2,8 +2,8 @@ import os
 import sys
 import json
 import ConfigParser
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import Qt,  pyqtWrapperType,  pyqtSlot,  pyqtSignal
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
 
 if not "mobase" in sys.modules:
     import mock_mobase as mobase
@@ -71,7 +71,7 @@ pair as the key's value (values become dictionaries)."""
             yield v['val']
 
 
-class MainWindow(QtGui.QDialog):
+class MainWindow(QtWidgets.QDialog):
     saveSettings = pyqtSignal(dict)
     def __init__(self,  settings,  parent = None):
         super(MainWindow,  self).__init__(parent)
@@ -88,20 +88,20 @@ class MainWindow(QtGui.QDialog):
         self.__ui.advancedButton.clicked.connect(self.__advancedClicked)
         self.__ui.saveButton.clicked.connect(self.__save)
         #self.__ui.settingsTree.header().setMinimumSectionSize(200)
-        self.__ui.settingsTree.header().setResizeMode(0,   QtGui.QHeaderView.Interactive)
-        self.__ui.settingsTree.header().setResizeMode(1,  QtGui.QHeaderView.Stretch)
+        self.__ui.settingsTree.header().setSectionResizeMode(0, QtWidgets.QHeaderView.Interactive)
+        self.__ui.settingsTree.header().setSectionResizeMode(1, QtWidgets.QHeaderView.Stretch)
         self.__lastSelectedCategory = ""
         self.__ui.closeButton.clicked.connect(self.close)
 
     def closeEvent(self,  event):
         if self.__ui.saveButton.isEnabled():
-            res = QtGui.QMessageBox.question(self,  "Unsaved changes", 
+            res = QtWidgets.QMessageBox.question(self,  "Unsaved changes", 
                             "There are unsaved changes. Do you want to save before closing the dialog?", 
-                            QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel, 
-                            QtGui.QMessageBox.Cancel)
-            if res == QtGui.QMessageBox.Save:
+                            QtWidgets.QMessageBox.Save | QtWidgets.QMessageBox.Discard | QtWidgets.QMessageBox.Cancel, 
+                            QtWidgets.QMessageBox.Cancel)
+            if res == QtWidgets.QMessageBox.Save:
                 self.__save()
-            elif res == QtGui.QMessageBox.Cancel:
+            elif res == QtWidgets.QMessageBox.Cancel:
                 event.ignore()
         else:
             super(MainWindow,  self).__init__(event)
@@ -130,10 +130,10 @@ class MainWindow(QtGui.QDialog):
         setting = self.__settings[self.__lastSelectedCategory][str(item.text(0))]
         saved = setting.get("saved",  setting["default"])
         if  saved != setting["value"]:
-            item.setIcon(0,  QtGui.QIcon(":/pyCfg/modified"))
+            item.setIcon(0, QtGui.QIcon(":/pyCfg/modified"))
             self.__ui.saveButton.setEnabled(True)
         else:
-            item.setIcon(0,  QtGui.QIcon(":/pyCfg/empty"))
+            item.setIcon(0, QtGui.QIcon(":/pyCfg/empty"))
 
     def __valueChangedIndex(self,  value):
         # odd problem: can't connect to the slot with text-parameter
@@ -158,9 +158,9 @@ class MainWindow(QtGui.QDialog):
                 self.__ui.categorySelection.addItem(cat)
 
     def __rgbClicked(self):
-        col = QtGui.QColorDialog.getColor(self.sender().palette().color(QtGui.QPalette.ButtonText))
+        col = QtWidgets.QColorDialog.getColor(self.sender().palette().color(QtWidgets.QPalette.ButtonText))
         palette = self.sender().palette()
-        palette.setColor(QtGui.QPalette.ButtonText,  col)
+        palette.setColor(QtWidgets.QPalette.ButtonText,  col)
         colStr = str(col.red()) + "," + str(col.green()) + "," + str(col.blue())
         print(colStr)
         self.__valueChanged(self.sender(),  colStr) # xxx
@@ -183,8 +183,8 @@ class MainWindow(QtGui.QDialog):
         self.__valueChanged(self.sender(),  value)
 
     def __genSelectionEntry(self,  key,  setting):
-        newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
-        selectionWidget = QtGui.QComboBox(self.__ui.settingsTree)
+        newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        selectionWidget = QtWidgets.QComboBox(self.__ui.settingsTree)
         selectionWidget.setProperty("key",  key)
         for val in setting["values"]:
             selectionWidget.addItem(str(val),  val)
@@ -196,8 +196,8 @@ class MainWindow(QtGui.QDialog):
         return newItem
 
     def __genBooleanEntry(self,  key,  setting):
-        newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
-        enableBtn = QtGui.QPushButton("true" if setting["value"] else "false",  self.__ui.settingsTree)
+        newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        enableBtn = QtWidgets.QPushButton("true" if setting["value"] else "false",  self.__ui.settingsTree)
         enableBtn.setProperty("key",  key)
         enableBtn.setCheckable(True)
         enableBtn.setChecked(setting["value"])
@@ -207,8 +207,8 @@ class MainWindow(QtGui.QDialog):
         return newItem
 
     def __genDoubleEditEntry(self,  key,  setting):
-        newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
-        editWidget = QtGui.QDoubleSpinBox(self.__ui.settingsTree)
+        newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
+        editWidget = QtWidgets.QDoubleSpinBox(self.__ui.settingsTree)
         if "range" in setting:
             editWidget.setRange(setting["range"]["lower"],  setting["range"]["upper"])
         else:
@@ -221,11 +221,11 @@ class MainWindow(QtGui.QDialog):
         return newItem
 
     def __genSlider(self,  range,  step,  key,  value):
-            newWidget = QtGui.QWidget(self.__ui.settingsTree)
-            layout = QtGui.QHBoxLayout(newWidget)
+            newWidget = QtWidgets.QWidget(self.__ui.settingsTree)
+            layout = QtWidgets.QHBoxLayout(newWidget)
             layout.setStretch(2,  1)
-            slider = QtGui.QSlider(Qt.Horizontal,  newWidget)
-            spin = QtGui.QSpinBox(self.__ui.settingsTree)
+            slider = QtWidgets.QSlider(Qt.Horizontal,  newWidget)
+            spin = QtWidgets.QSpinBox(self.__ui.settingsTree)
             slider.setProperty("key",  key)
             slider.setRange(range["lower"],  range["upper"])
             spin.setRange(range["lower"],  range["upper"])
@@ -243,11 +243,11 @@ class MainWindow(QtGui.QDialog):
             return newWidget
 
     def __genIntEditEntry(self,  key,  setting):
-        newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
+        newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
         if "range" in setting:
             newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  str(key),  setting["value"])
         else:
-            newWidget = QtGui.QSpinBox(self.__ui.settingsTree)
+            newWidget = QtWidgets.QSpinBox(self.__ui.settingsTree)
             newWidget.setRange(-sys.maxint,  sys.maxint)
             newWidget.setSingleStep(setting.get("step",  1))
             newWidget.setProperty("key",  key)
@@ -257,11 +257,11 @@ class MainWindow(QtGui.QDialog):
         return newItem
 
     def __genUnsignedEditEntry(self,  key,  setting):
-        newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
+        newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
         if "range" in setting:
             newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  key,  setting["value"])
         else:
-            newWidget = QtGui.QSpinBox(self.__ui.settingsTree)
+            newWidget = QtWidgets.QSpinBox(self.__ui.settingsTree)
             newWidget.setRange(0,   sys.maxint)
             newWidget.setSingleStep(setting.get("step",  1))
             newWidget.setProperty("key",  key)
@@ -271,8 +271,8 @@ class MainWindow(QtGui.QDialog):
         return newItem
 
     def __genEditEntry(self,  key,  setting):
-        newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
-        editBox = QtGui.QLineEdit(str(setting["value"]),  self.__ui.settingsTree)
+        newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        editBox = QtWidgets.QLineEdit(str(setting["value"]),  self.__ui.settingsTree)
         editBox.setProperty("key",  key)
         editBox.editingFinished.connect(self.__editBoxChanged)
         # editBox.textEdited.connect(self.__editBoxChanged) this would be better but crashes for unknown reasons
@@ -281,15 +281,15 @@ class MainWindow(QtGui.QDialog):
         return newItem
 
     def __genColorEntry(self,  key,  setting):
-        newItem = QtGui.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
-        colorBtn = QtGui.QPushButton("Color",  self.__ui.settingsTree)
+        newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        colorBtn = QtWidgets.QPushButton("Color",  self.__ui.settingsTree)
         if setting["value"] == "":
             rgb = [ 0,  0,  0 ]
         else:
             rgb = [ int(col) for col in str(setting["value"]).split(",") ]
-        color = QtGui.QColor(rgb[0],  rgb[1],  rgb[2])
+        color = QtWidgets.QColor(rgb[0],  rgb[1],  rgb[2])
         palette = colorBtn.palette()
-        palette.setColor(QtGui.QPalette.ButtonText,  color)
+        palette.setColor(QtWidgets.QPalette.ButtonText,  color)
         colorBtn.setPalette(palette)
         font = colorBtn.font()
         font.setBold(True)
