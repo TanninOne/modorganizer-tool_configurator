@@ -2,8 +2,11 @@ import os
 import sys
 import json
 import ConfigParser
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
+from PyQt4 import QtCore, QtGui
+from PyQt4.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
+# qt5
+#from PyQt5 import QtCore, QtGui, QtWidgets
+#from PyQt5.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
 
 if not "mobase" in sys.modules:
     import mock_mobase as mobase
@@ -119,7 +122,11 @@ class MainWindow(QtWidgets.QDialog):
 
     def __valueChanged(self,  sender,  value):
         section = str(self.__ui.categorySelection.currentText())
-        itemName = sender.property("key").toString()
+        # this should be a qvariant according to documentation but in pyqt5 it's not?
+        if type(sender.property("key")) == QtCore.QVariant:
+            itemName = sender.property("key").toString()
+        else:
+            itemName = sender.property("key")
         setting = self.__settings[section][str(itemName)]
         setting["value"] = value
         matches = self.__ui.settingsTree.findItems(itemName,  QtCore.Qt.MatchExactly)
@@ -176,6 +183,8 @@ class MainWindow(QtWidgets.QDialog):
             self.__valueChanged(self.sender(),  False)
             self.sender().setIcon(QtGui.QIcon(":/pyCfg/false"))
 
+    # qt5
+    # def __editBoxChanged(self, ignore):
     def __editBoxChanged(self):
         self.__valueChanged(self.sender(),  str(self.sender().text()))
 
@@ -274,8 +283,9 @@ class MainWindow(QtWidgets.QDialog):
         newItem = QtWidgets.QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
         editBox = QtWidgets.QLineEdit(str(setting["value"]),  self.__ui.settingsTree)
         editBox.setProperty("key",  key)
+        # connecting to textEdited crashes with PyQt4 for unknown reason, editingFinished does not
         editBox.editingFinished.connect(self.__editBoxChanged)
-        # editBox.textEdited.connect(self.__editBoxChanged) this would be better but crashes for unknown reasons
+        # editBox.textEdited.connect(self.__editBoxChanged)
         self.__ui.settingsTree.setItemWidget(newItem,  1,   editBox)
 
         return newItem
