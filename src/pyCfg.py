@@ -409,7 +409,7 @@ class IniEdit(mobase.IPluginTool):
         gameType = self.__organizer.gameInfo().type()
         if str(gameType) == "oblivion":
             return [ "oblivion.ini",  "oblivionprefs.ini" ]
-        elif str(gameType) == "fallout3" or gameType == "falloutnv":
+        elif str(gameType) == "fallout3" or str(gameType) == "falloutnv":
             return [ "fallout.ini",  "falloutprefs.ini" ]
         elif str(gameType) == "skyrim":
             return [ "skyrim.ini",  "skyrimprefs.ini" ]
@@ -449,7 +449,7 @@ class IniEdit(mobase.IPluginTool):
             else:
                 settings.updateKey(section)
 
-            for setting in parser.items(section):
+            for setting in parser.items(section, True):
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1]
                 if setting[0][0] == 'b':
