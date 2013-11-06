@@ -362,6 +362,27 @@ class MainWindow(QDialog):
         self.__updateTree()
 
 
+
+class MagicFile(file):
+    def __init__(self, filename, mode):
+        super(MagicFile, self).__init__(filename, mode)
+
+    def readline(self, size=-1):
+        temp = super(MagicFile, self).readline(size)
+        if len(temp) == 0:
+            return temp
+
+        esidx = temp.find('=')
+        # comment
+        if temp[0] == ';' or temp[0] == '#' or temp[0] == '[':
+            return temp
+        # no equals sign
+        if esidx == -1:
+            return "  " + temp
+        else:
+          return temp
+
+
 class IniEdit(mobase.IPluginTool):
     def init(self, organizer):
         import pyCfgResource_rc
@@ -440,9 +461,10 @@ class IniEdit(mobase.IPluginTool):
         return newSettings
 
     def updateSettings(self,  settings,  file):
-        parser = ConfigParser.SafeConfigParser()
+        parser = ConfigParser.SafeConfigParser(allow_no_value=True)
         parser.optionxform = str
-        parser.read(self.__organizer.profilePath() + "/" + file)
+        file = MagicFile(self.__organizer.profilePath() + "/" + file, 'r')
+        parser.readfp(file)
         for section in parser.sections():
             if not section in settings:
                 settings[section] = CaselessDict()
@@ -451,7 +473,7 @@ class IniEdit(mobase.IPluginTool):
 
             for setting in parser.items(section, True):
                 newData = settings[section].get(setting[0],  {})
-                value = setting[1]
+                value = setting[1].split('//')[0].strip()
                 if setting[0][0] == 'b':
                     value = True if value == "1" else False
                 elif setting[0][0] == 'i' or setting[0][0] == 'u':
@@ -497,7 +519,7 @@ class IniEdit(mobase.IPluginTool):
     def display(self):
         settings = self.__filteredSettings()
         for iniFile in self.__iniFiles():
-            self.updateSettings(settings,  iniFile)
+            self.updateSettings(settings, iniFile)
 
         win = MainWindow(settings)
         win.saveSettings.connect(self.__save)
