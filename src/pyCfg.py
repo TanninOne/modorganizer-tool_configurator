@@ -460,10 +460,10 @@ class IniEdit(mobase.IPluginTool):
                 newSettings[sectionKey] = filteredSection
         return newSettings
 
-    def updateSettings(self,  settings,  file):
+    def updateSettings(self,  settings,  fileName):
         parser = ConfigParser.SafeConfigParser(allow_no_value=True)
         parser.optionxform = str
-        file = MagicFile(self.__organizer.profilePath() + "/" + file, 'r')
+        file = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
         parser.readfp(file)
         for section in parser.sections():
             if not section in settings:
@@ -482,39 +482,42 @@ class IniEdit(mobase.IPluginTool):
                     value = float(value)
                 newData["value"] = value
                 newData["saved"] = value
-                newData["file"] = file
+                newData["file"] = fileName
                 if not "default" in newData:
                     newData["default"] = value
                 settings[section][str(setting[0])] = newData
 
     def __save(self,  settings):
-        iniFiles = {}
-        for fileName in self.__iniFiles():
-            parser = ConfigParser.SafeConfigParser()
-            parser.optionxform = str
-            parser.read(self.__organizer.profilePath() + "/" + fileName)
-            iniFiles[fileName]  = parser
+        try:
+          iniFiles = {}
+          for fileName in self.__iniFiles():
+              parser = ConfigParser.SafeConfigParser(allow_no_value=True)
+              parser.optionxform = str
+              file = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
+              parser.readfp(file)
+              iniFiles[fileName] = parser
+          count = 0
+          for sectionkey, section in settings.iteritems():
+              count += 1
+              for settingkey, setting in section.iteritems():
+                  if setting["value"] != setting.get("saved",  setting["default"]):
+                      print("changed " + sectionkey)
+                      try:
+                          iniFiles[setting["file"]].add_section(sectionkey)
+                      except ConfigParser.DuplicateSectionError:
+                          pass
 
-        count = 0
-        for sectionkey, section in settings.iteritems():
-            count += 1
-            for settingkey,  setting in section.iteritems():
-                if setting["value"] != setting.get("saved",  setting["default"]):
-                    try:
-                        iniFiles[setting["file"]].add_section(sectionkey)
-                    except ConfigParser.DuplicateSectionError:
-                        pass
-
-                    if type(setting["value"]) == bool:
-                        iniFiles[setting["file"]].set(sectionkey,  settingkey,  '1' if setting["value"] else '0')
-                    else:
-                        iniFiles[setting["file"]].set(sectionkey,  settingkey,  str(setting["value"]))
-                    setting["saved"] = setting["value"]
-
-        for fileName,  data in iniFiles.iteritems():
-            out = open(self.__organizer.profilePath() + "/" + fileName,  'w')
-            data.write(out)
-            out.close()
+                      if type(setting["value"]) == bool:
+                          iniFiles[setting["file"]].set(sectionkey,  settingkey,  '1' if setting["value"] else '0')
+                      else:
+                          iniFiles[setting["file"]].set(sectionkey,  settingkey,  str(setting["value"]))
+                      setting["saved"] = setting["value"]
+          for fileName,  data in iniFiles.iteritems():
+              out = open(self.__organizer.profilePath() + "/" + fileName,  'w')
+              data.write(out)
+              out.close()
+        except Exception, e:
+            print e
 
     def display(self):
         settings = self.__filteredSettings()
