@@ -4,14 +4,14 @@ import json
 import ConfigParser
 from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
-from PyQt4.QtGui import QDialog, QHeaderView, QMessageBox, QColorDialog, QPalette, QTreeWidgetItem,\
+from PyQt4.QtGui import QDialog, QHeaderView, QMessageBox, QColor, QColorDialog, QPalette, QTreeWidgetItem,\
 QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
 pyqt5 = False
 
 # qt5
 #from PyQt5 import QtCore, QtGui, QtWidgets
 #from PyQt5.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
-#from PyQt5.QtWidget import QDialog, QHeaderView, QMessageBox, QColorDialog, QPalette, QTreeWidgetItem,\
+#from PyQt5.QtWidget import QDialog, QHeaderView, QMessageBox, QColor, QColorDialog, QPalette, QTreeWidgetItem,\
 #QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
 #pyqt5 = True
 
