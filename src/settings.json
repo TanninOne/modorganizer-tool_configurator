@@ -4239,9 +4239,7 @@
       "flags":[
         "basic"
       ],
-      "description":[
-        "Controls whether grass is drawn at all"
-      ]
+      "description":"Controls whether grass is drawn at all"
     },
     "b30GrassVS":{
       "default":false,

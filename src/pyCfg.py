@@ -345,6 +345,7 @@ class MainWindow(QDialog):
             return
         category = str(self.__ui.categorySelection.currentText())
         self.__lastSelectedCategory = category
+
         for settingKey in sorted(self.__settings[category].keys(),  key=lambda setKey: setKey[1:]):
             setting = self.__settings[category][settingKey]
             if not self.__ui.advancedButton.isChecked() and not "basic" in setting.get("flags",  []):
@@ -352,8 +353,9 @@ class MainWindow(QDialog):
             newItem = self.__addSetting(settingKey,  setting)
             self.__updateIcon(newItem)
             if "description" in setting:
-                newItem.setToolTip(0,  setting["description"])
-            newItem.setToolTip(1,  "Default: " + str(setting["default"]))
+                newItem.setToolTip(0, str(setting["description"]))
+            if "default" in setting:
+                newItem.setToolTip(1, "Default: " + str(setting["default"]))
             self.__ui.settingsTree.addTopLevelItem(newItem)
 
         self.__ui.settingsTree.resizeColumnToContents(0)
@@ -388,10 +390,11 @@ class IniEdit(mobase.IPluginTool):
         import pyCfgResource_rc
 
         self.__organizer = organizer
+        self.__window = None
         try:
-                f = open(organizer.pluginDataPath() + "/settings.json", "r")
+            f = open(organizer.pluginDataPath() + "/settings.json", "r")
         except IOError:
-                return False
+            return False
         self.__settings = json.loads(f.read())
         f.close()
         return True
@@ -474,12 +477,22 @@ class IniEdit(mobase.IPluginTool):
             for setting in parser.items(section, True):
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1].split('//')[0].strip()
-                if setting[0][0] == 'b':
-                    value = True if value == "1" else False
-                elif setting[0][0] == 'i' or setting[0][0] == 'u':
-                    value = int(value)
-                elif setting[0][0] == 'f':
-                    value = float(value)
+                try:
+                    if setting[0][0] == 'b':
+                        value = True if value == "1" else False
+                    elif setting[0][0] == 'i' or setting[0][0] == 'u':
+                        value = int(value)
+                    elif setting[0][0] == 'f':
+                        try:
+                            value = float(value)
+                        except ValueError:
+                            value = float(int(value))
+                except ValueError, e:
+                    QMessageBox.warning(self.__window,  "Invalid configuration file",
+                                    "Your configuration files contains an invalid value: {0}={1} (in section {2}).\n".format(str(setting[0]), str(setting[1]), section)
+                                    + "Please note that the game probably won't report an error, it will just ignore this setting.\n"
+                                    + "Please note that even if someone told you to use this setting, that doesn't mean they know what they're talking about.\n"
+                                    + "BUT, if you know for a fact this is a valid setting, then please contact me at sherb@gmx.net.")
                 newData["value"] = value
                 newData["saved"] = value
                 newData["file"] = fileName
@@ -524,9 +537,9 @@ class IniEdit(mobase.IPluginTool):
         for iniFile in self.__iniFiles():
             self.updateSettings(settings, iniFile)
 
-        win = MainWindow(settings)
-        win.saveSettings.connect(self.__save)
-        win.exec_()
+        self.__window = MainWindow(settings)
+        self.__window.saveSettings.connect(self.__save)
+        self.__window.exec_()
 
 def createPlugin():
         return IniEdit()
