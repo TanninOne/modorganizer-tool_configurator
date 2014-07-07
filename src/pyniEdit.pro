@@ -9,9 +9,9 @@ SOURCES += \
 
 
 CONFIG(debug, debug|release) {
-	DSTDIR = $$PWD/../../../outputd
+  DSTDIR = $$PWD/../../../outputd
 } else {
-	DSTDIR = $$PWD/../../../output
+  DSTDIR = $$PWD/../../../output
 }
 WINPWD = $$PWD
 
