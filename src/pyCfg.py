@@ -499,6 +499,7 @@ class IniEdit(mobase.IPluginTool):
                 if not "default" in newData:
                     newData["default"] = value
                 settings[section][str(setting[0])] = newData
+        file.close()
 
     def __save(self,  settings):
         try:
@@ -509,12 +510,12 @@ class IniEdit(mobase.IPluginTool):
               file = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
               parser.readfp(file)
               iniFiles[fileName] = parser
+              file.close()
           count = 0
           for sectionkey, section in settings.iteritems():
               count += 1
               for settingkey, setting in section.iteritems():
                   if setting["value"] != setting.get("saved",  setting["default"]):
-                      print("changed " + sectionkey)
                       try:
                           iniFiles[setting["file"]].add_section(sectionkey)
                       except ConfigParser.DuplicateSectionError:
