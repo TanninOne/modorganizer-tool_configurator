@@ -1,12 +1,23 @@
-OTHER_FILES += \
-    pyCfg.py
+#OTHER_FILES += \
+#    pyCfg.py
 
 FORMS += \
     pyCfgDialog.ui
 
 SOURCES += \
+    pyCfg.py \
     dummy.cpp
 
+TRANSLATIONS = $${TARGET}_en.ts \
+               $${TARGET}_de.ts \
+               $${TARGET}_es.ts \
+               $${TARGET}_fr.ts \
+               $${TARGET}_zh_TW.ts \
+               $${TARGET}_zh_CN.ts \
+               $${TARGET}_cs.ts \
+               $${TARGET}_tr.ts \
+               $${TARGET}_ko.ts \
+               $${TARGET}_ru.ts
 
 CONFIG(debug, debug|release) {
   DSTDIR = $$PWD/../../../outputd
