@@ -1,12 +1,16 @@
 #OTHER_FILES += \
 #    pyCfg.py
 
+TARGET = dummy
+
 FORMS += \
     pyCfgDialog.ui
 
 SOURCES += \
-    pyCfg.py \
     dummy.cpp
+
+OTHER_FILES += \
+    pyCfg.py
 
 TRANSLATIONS = $${TARGET}_en.ts \
                $${TARGET}_de.ts \
