@@ -495,7 +495,8 @@ class IniEdit(mobase.IPluginTool):
                                     + "BUT, if you know for a fact this is a valid setting, then please contact me at sherb@gmx.net.")
                 newData["value"] = value
                 newData["saved"] = value
-                newData["file"] = fileName
+                if "file" not in newData:
+                    newData["file"] = fileName
                 if not "default" in newData:
                     newData["default"] = value
                 settings[section][str(setting[0])] = newData
