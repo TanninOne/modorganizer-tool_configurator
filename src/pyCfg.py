@@ -477,6 +477,9 @@ class IniEdit(mobase.IPluginTool):
                 settings.updateKey(section)
 
             for setting in parser.items(section, True):
+                if setting[0] not in settings[section]:
+                    print(str(setting) + " in wrong ini file")
+                    continue
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1].split('//')[0].strip()
                 try:
@@ -497,7 +500,8 @@ class IniEdit(mobase.IPluginTool):
                                     + "BUT, if you know for a fact this is a valid setting, then please contact me at sherb@gmx.net.")
                 newData["value"] = value
                 newData["saved"] = value
-                newData["file"] = fileName
+                if "file" not in newData:
+                    newData["file"] = fileName
                 if not "default" in newData:
                     newData["default"] = value
                 settings[section][str(setting[0])] = newData
