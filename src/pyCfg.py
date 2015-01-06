@@ -183,7 +183,6 @@ class MainWindow(QDialog):
         palette = self.sender().palette()
         palette.setColor(QPalette.ButtonText,  col)
         colStr = str(col.red()) + "," + str(col.green()) + "," + str(col.blue())
-        print(colStr)
         self.__valueChanged(self.sender(),  colStr) # xxx
         self.sender().setPalette(palette)
 
@@ -411,7 +410,7 @@ class IniEdit(mobase.IPluginTool):
         return "Plugin to allow easier customization of game settings"
 
     def version(self):
-        return mobase.VersionInfo(1, 0, 0, mobase.ReleaseType.beta)
+        return mobase.VersionInfo(1, 0, 0, mobase.ReleaseType.final)
 
     def isActive(self):
         return True
