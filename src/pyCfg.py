@@ -476,7 +476,7 @@ class IniEdit(mobase.IPluginTool):
 
             for setting in parser.items(section, True):
                 if setting[0] not in settings[section]:
-                    print(str(setting) + " in wrong ini file")
+                    QtCore.qDebug(str(setting) + " in wrong ini file")
                     continue
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1].split('//')[0].strip()
