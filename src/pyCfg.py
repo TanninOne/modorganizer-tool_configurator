@@ -2,18 +2,20 @@ import os
 import sys
 import json
 import ConfigParser
-from PyQt4 import QtCore, QtGui
-from PyQt4.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
-from PyQt4.QtGui import QDialog, QHeaderView, QMessageBox, QColor, QColorDialog, QPalette, QTreeWidgetItem,\
-QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
-pyqt5 = False
+#from PyQt4 import QtCore, QtGui
+#from PyQt4.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
+#from PyQt4.QtGui import QDialog, QHeaderView, QMessageBox, QColor, QColorDialog, QPalette, QTreeWidgetItem,\
+#QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
+#pyqt5 = False
 
 # qt5
-#from PyQt5 import QtCore, QtGui, QtWidgets
-#from PyQt5.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
-#from PyQt5.QtWidget import QDialog, QHeaderView, QMessageBox, QColor, QColorDialog, QPalette, QTreeWidgetItem,\
-#QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
-#pyqt5 = True
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
+from PyQt5.QtGui import QColor, QPalette
+from PyQt5.QtWidgets import QDialog, QHeaderView, QMessageBox, QColorDialog, QTreeWidgetItem,\
+QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
+pyqt5 = True
+
 
 if not "mobase" in sys.modules:
     import mock_mobase as mobase
@@ -181,7 +183,6 @@ class MainWindow(QDialog):
         palette = self.sender().palette()
         palette.setColor(QPalette.ButtonText,  col)
         colStr = str(col.red()) + "," + str(col.green()) + "," + str(col.blue())
-        print(colStr)
         self.__valueChanged(self.sender(),  colStr) # xxx
         self.sender().setPalette(palette)
 
@@ -409,7 +410,7 @@ class IniEdit(mobase.IPluginTool):
         return "Plugin to allow easier customization of game settings"
 
     def version(self):
-        return mobase.VersionInfo(1, 0, 0, mobase.ReleaseType.beta)
+        return mobase.VersionInfo(1, 0, 0, mobase.ReleaseType.final)
 
     def isActive(self):
         return True
