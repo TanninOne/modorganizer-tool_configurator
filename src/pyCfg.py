@@ -349,7 +349,9 @@ class MainWindow(QDialog):
 
         for settingKey in sorted(self.__settings[category].keys(),  key=lambda setKey: setKey[1:]):
             setting = self.__settings[category][settingKey]
-            if not self.__ui.advancedButton.isChecked() and not "basic" in setting.get("flags",  []):
+            if "hidden" in setting.get("flags", []):
+                continue
+            if not self.__ui.advancedButton.isChecked() and "basic" not in setting.get("flags", []):
                 continue
             newItem = self.__addSetting(settingKey,  setting)
             self.__updateIcon(newItem)
@@ -451,12 +453,12 @@ class IniEdit(mobase.IPluginTool):
             section = self.__settings[sectionKey]
             filteredSection = CaselessDict()
             for key,  setting in section.iteritems():
-                setting["value"] = setting["default"]   
-                setting["file"] = iniFiles[1] if "prefs" in setting.get("flags",  []) else iniFiles[0]
-                if "hidden" in setting.get("flags",  []):
-                    # set to hidden
-                    continue
-                if "games" in setting and not gameName in setting["games"]:
+                setting["value"] = setting["default"]
+                if "prefs" in setting.get("flags", []):
+                    setting["file"] = iniFiles[1]
+                else:
+                    setting["file"] = iniFiles[0]
+                if "games" in setting and gameName not in setting["games"]:
                     # not for this game
                     continue
                 filteredSection[str(key)] = setting
@@ -476,8 +478,9 @@ class IniEdit(mobase.IPluginTool):
                 settings.updateKey(section)
 
             for setting in parser.items(section, True):
-                if setting[0] not in settings[section]:
-                    QtCore.qDebug(str(setting) + " in wrong ini file")
+                # test if the setting is allowed in this file
+                if setting[0].lower() not in settings[section]:
+                    QtCore.qDebug("unknown ini setting {0}".format(str(setting[0])))
                     continue
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1].split('//')[0].strip()
