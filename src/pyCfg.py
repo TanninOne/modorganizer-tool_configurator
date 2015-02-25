@@ -482,6 +482,13 @@ class IniEdit(mobase.IPluginTool):
                 if setting[0].lower() not in settings[section]:
                     QtCore.qDebug("unknown ini setting {0}".format(str(setting[0])))
                     continue
+
+                if "both" not in settings[section][setting[0]].get("flags", [])\
+                        and fileName.lower() != settings[section][setting[0]]["file"].lower():
+                    QtCore.qDebug("{0} in wrong ini file ({1}, should be {2})".format(
+                        str(setting[0]), fileName, settings[section][setting[0]]["file"]))
+                    continue
+
                 newData = settings[section].get(setting[0],  {})
                 value = setting[1].split('//')[0].strip()
                 try:
