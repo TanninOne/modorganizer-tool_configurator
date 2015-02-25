@@ -2,22 +2,15 @@ import os
 import sys
 import json
 import ConfigParser
-#from PyQt4 import QtCore, QtGui
-#from PyQt4.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
-#from PyQt4.QtGui import QDialog, QHeaderView, QMessageBox, QColor, QColorDialog, QPalette, QTreeWidgetItem,\
-#QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
-#pyqt5 = False
 
 # qt5
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import Qt, pyqtWrapperType, pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import QDialog, QHeaderView, QMessageBox, QColorDialog, QTreeWidgetItem,\
-QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
-pyqt5 = True
+    QComboBox, QPushButton, QDoubleSpinBox, QHBoxLayout, QWidget, QSlider, QSpinBox, QLineEdit
 
-
-if not "mobase" in sys.modules:
+if "mobase" not in sys.modules:
     import mock_mobase as mobase
 
 class CaselessDict(dict):
@@ -27,7 +20,8 @@ when keys are listed, ie, via keys() or items() methods.
 Works by storing a lowercase version of the key as the new key and stores the original key-value 
 pair as the key's value (values become dictionaries)."""
  
-    def __init__(self, initval={}):
+    def __init__(self, initval=dict()):
+        super(CaselessDict, self).__init__(initval)
         if isinstance(initval, dict):
             for key, value in initval.iteritems():
                 self.__setitem__(key, value)
@@ -55,7 +49,7 @@ pair as the key's value (values become dictionaries)."""
         else:
             return v['val']
  
-    def has_key(self,key):
+    def has_key(self, key):
         if self.get(key):
             return True
         else:
@@ -85,7 +79,8 @@ pair as the key's value (values become dictionaries)."""
 
 class MainWindow(QDialog):
     saveSettings = pyqtSignal(dict)
-    def __init__(self,  settings,  parent = None):
+
+    def __init__(self,  settings,  parent=None):
         super(MainWindow,  self).__init__(parent)
         self.__settings = settings
         from pyCfgDialog import Ui_PyCfgDialog
@@ -99,23 +94,18 @@ class MainWindow(QDialog):
         self.__ui.categorySelection.currentIndexChanged[int].connect(self.__sectionChanged)
         self.__ui.advancedButton.clicked.connect(self.__advancedClicked)
         self.__ui.saveButton.clicked.connect(self.__save)
-        #self.__ui.settingsTree.header().setMinimumSectionSize(200)
-        if pyqt5:
-            self.__ui.settingsTree.header().setSectionResizeMode(0, QHeaderView.Interactive)
-            self.__ui.settingsTree.header().setSectionResizeMode(1, QHeaderView.Stretch)
-        else:
-            self.__ui.settingsTree.header().setResizeMode(0, QHeaderView.Interactive)
-            self.__ui.settingsTree.header().setResizeMode(1, QHeaderView.Stretch)
+        self.__ui.settingsTree.header().setSectionResizeMode(0, QHeaderView.Interactive)
+        self.__ui.settingsTree.header().setSectionResizeMode(1, QHeaderView.Stretch)
 
         self.__lastSelectedCategory = ""
         self.__ui.closeButton.clicked.connect(self.close)
 
     def closeEvent(self,  event):
         if self.__ui.saveButton.isEnabled():
-            res = QMessageBox.question(self,  "Unsaved changes", 
-                            "There are unsaved changes. Do you want to save before closing the dialog?", 
-                            QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel, 
-                            QMessageBox.Cancel)
+            res = QMessageBox.question(self,  "Unsaved changes",
+                                       "There are unsaved changes. Do you want to save before closing the dialog?",
+                                       QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
+                                       QMessageBox.Cancel)
             if res == QMessageBox.Save:
                 self.__save()
             elif res == QMessageBox.Cancel:
@@ -187,7 +177,7 @@ class MainWindow(QDialog):
         self.sender().setPalette(palette)
 
     def __boolClicked(self):
-        if self.sender().isChecked() :
+        if self.sender().isChecked():
             self.sender().setText("true")
             self.__valueChanged(self.sender(),  True)
             self.sender().setIcon(QtGui.QIcon(":/pyCfg/true"))
@@ -205,7 +195,7 @@ class MainWindow(QDialog):
         self.__valueChanged(self.sender(),  value)
 
     def __genSelectionEntry(self,  key,  setting):
-        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [key])
         selectionWidget = QComboBox(self.__ui.settingsTree)
         selectionWidget.setProperty("key",  key)
         for val in setting["values"]:
@@ -218,18 +208,18 @@ class MainWindow(QDialog):
         return newItem
 
     def __genBooleanEntry(self,  key,  setting):
-        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        newItem = QTreeWidgetItem(self.__ui.settingsTree, [key])
         enableBtn = QPushButton("true" if setting["value"] else "false",  self.__ui.settingsTree)
         enableBtn.setProperty("key",  key)
         enableBtn.setCheckable(True)
         enableBtn.setChecked(setting["value"])
         enableBtn.setIcon(QtGui.QIcon(":/pyCfg/true") if setting["value"] else QtGui.QIcon(":/pyCfg/false"))
-        self.__ui.settingsTree.setItemWidget(newItem,  1,   enableBtn)
+        self.__ui.settingsTree.setItemWidget(newItem,  1, enableBtn)
         enableBtn.clicked.connect(self.__boolClicked)
         return newItem
 
     def __genDoubleEditEntry(self,  key,  setting):
-        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
+        newItem = QTreeWidgetItem(self.__ui.settingsTree, [key, ""])
         editWidget = QDoubleSpinBox(self.__ui.settingsTree)
         if "range" in setting:
             editWidget.setRange(setting["range"]["lower"],  setting["range"]["upper"])
@@ -261,11 +251,11 @@ class MainWindow(QDialog):
             slider.valueChanged.connect(spin.setValue)
             spin.valueChanged.connect(slider.setValue)
             newWidget.setLayout(layout)
-            slider.valueChanged.connect(self.__sliderChanged) # xxx
+            slider.valueChanged.connect(self.__sliderChanged)
             return newWidget
 
     def __genIntEditEntry(self,  key,  setting):
-        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
+        newItem = QTreeWidgetItem(self.__ui.settingsTree, [key, ""])
         if "range" in setting:
             newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  str(key),  setting["value"])
         else:
@@ -274,12 +264,12 @@ class MainWindow(QDialog):
             newWidget.setSingleStep(setting.get("step",  1))
             newWidget.setProperty("key",  key)
             newWidget.setValue(setting["value"])
-            newWidget.valueChanged.connect(self.__sliderChanged) # xxx
+            newWidget.valueChanged.connect(self.__sliderChanged)
         self.__ui.settingsTree.setItemWidget(newItem,  1,   newWidget)
         return newItem
 
     def __genUnsignedEditEntry(self,  key,  setting):
-        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [ key,  "" ] )
+        newItem = QTreeWidgetItem(self.__ui.settingsTree, [key, ""])
         if "range" in setting:
             newWidget = self.__genSlider(setting["range"],  setting.get("step",  1),  key,  setting["value"])
         else:
@@ -293,7 +283,7 @@ class MainWindow(QDialog):
         return newItem
 
     def __genEditEntry(self,  key,  setting):
-        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        newItem = QTreeWidgetItem(self.__ui.settingsTree, [key])
         editBox = QLineEdit(str(setting["value"]),  self.__ui.settingsTree)
         editBox.setProperty("key",  key)
         # connecting to textEdited crashes with PyQt4 for unknown reason, editingFinished does not
@@ -304,12 +294,12 @@ class MainWindow(QDialog):
         return newItem
 
     def __genColorEntry(self,  key,  setting):
-        newItem = QTreeWidgetItem(self.__ui.settingsTree,  [ key ] )
+        newItem = QTreeWidgetItem(self.__ui.settingsTree, [key])
         colorBtn = QPushButton("Color",  self.__ui.settingsTree)
         if setting["value"] == "":
-            rgb = [ 0,  0,  0 ]
+            rgb = [0,  0,  0]
         else:
-            rgb = [ int(col) for col in str(setting["value"]).split(",") ]
+            rgb = [int(col) for col in str(setting["value"]).split(",")]
         color = QColor(rgb[0],  rgb[1],  rgb[2])
         palette = colorBtn.palette()
         palette.setColor(QPalette.ButtonText,  color)
@@ -347,7 +337,7 @@ class MainWindow(QDialog):
         category = str(self.__ui.categorySelection.currentText())
         self.__lastSelectedCategory = category
 
-        for settingKey in sorted(self.__settings[category].keys(),  key=lambda setKey: setKey[1:]):
+        for settingKey in sorted(self.__settings[category].keys(), key=lambda setKey: setKey[1:]):
             setting = self.__settings[category][settingKey]
             if "hidden" in setting.get("flags", []):
                 continue
@@ -385,13 +375,20 @@ class MagicFile(file):
         if esidx == -1:
             return "  " + temp
         else:
-          return temp
+            return temp
 
 
 class IniEdit(mobase.IPluginTool):
-    def init(self, organizer):
-        import pyCfgResource_rc
 
+    def __init__(self):
+        super(IniEdit, self).__init__()
+        self.__organizer = None
+        self.__window = None
+        self.__settings = None
+        self.__parentWidget = None
+
+    def init(self, organizer):
+        import pyCfgResource_rc  # required to make icons available
         self.__organizer = organizer
         self.__window = None
         try:
@@ -435,11 +432,11 @@ class IniEdit(mobase.IPluginTool):
     def __iniFiles(self):
         gameType = self.__organizer.gameInfo().type()
         if str(gameType) == "oblivion":
-            return [ "oblivion.ini",  "oblivionprefs.ini" ]
+            return ["oblivion.ini",  "oblivionprefs.ini"]
         elif str(gameType) == "fallout3" or str(gameType) == "falloutnv":
-            return [ "fallout.ini",  "falloutprefs.ini" ]
+            return ["fallout.ini",  "falloutprefs.ini"]
         elif str(gameType) == "skyrim":
-            return [ "skyrim.ini",  "skyrimprefs.ini" ]
+            return ["skyrim.ini",  "skyrimprefs.ini"]
         else:
             return []
 
@@ -466,14 +463,15 @@ class IniEdit(mobase.IPluginTool):
                 newSettings[sectionKey] = filteredSection
         return newSettings
 
-    def updateSettings(self,  settings,  fileName):
+    def updateSettings(self, settings, fileName):
         parser = ConfigParser.SafeConfigParser(allow_no_value=True)
         parser.optionxform = str
-        file = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
-        parser.readfp(file)
+        cfgFile = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
+        parser.readfp(cfgFile)
         for section in parser.sections():
-            if not section in settings:
-                settings[section] = CaselessDict()
+            if section not in settings:
+                QtCore.qDebug("unexpected section {0} in {1}".format(section, fileName))
+                continue
             else:
                 settings.updateKey(section)
 
@@ -511,40 +509,40 @@ class IniEdit(mobase.IPluginTool):
                 newData["saved"] = value
                 if "file" not in newData:
                     newData["file"] = fileName
-                if not "default" in newData:
+                if "default" not in newData:
                     newData["default"] = value
                 settings[section][str(setting[0])] = newData
-        file.close()
+        cfgFile.close()
 
     def __save(self,  settings):
         try:
-          iniFiles = {}
-          for fileName in self.__iniFiles():
-              parser = ConfigParser.SafeConfigParser(allow_no_value=True)
-              parser.optionxform = str
-              file = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
-              parser.readfp(file)
-              iniFiles[fileName] = parser
-              file.close()
-          count = 0
-          for sectionkey, section in settings.iteritems():
-              count += 1
-              for settingkey, setting in section.iteritems():
-                  if setting["value"] != setting.get("saved",  setting["default"]):
-                      try:
-                          iniFiles[setting["file"]].add_section(sectionkey)
-                      except ConfigParser.DuplicateSectionError:
-                          pass
+            ini_files = {}
+            for fileName in self.__iniFiles():
+                parser = ConfigParser.SafeConfigParser(allow_no_value=True)
+                parser.optionxform = str
+                cfgFile = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
+                parser.readfp(cfgFile)
+                ini_files[fileName] = parser
+                cfgFile.close()
+            count = 0
+            for sectionkey, section in settings.iteritems():
+                count += 1
+                for settingkey, setting in section.iteritems():
+                    if setting["value"] != setting.get("saved",  setting["default"]):
+                        try:
+                            ini_files[setting["file"]].add_section(sectionkey)
+                        except ConfigParser.DuplicateSectionError:
+                            pass
 
-                      if type(setting["value"]) == bool:
-                          iniFiles[setting["file"]].set(sectionkey,  settingkey,  '1' if setting["value"] else '0')
-                      else:
-                          iniFiles[setting["file"]].set(sectionkey,  settingkey,  str(setting["value"]))
-                      setting["saved"] = setting["value"]
-          for fileName,  data in iniFiles.iteritems():
-              out = open(self.__organizer.profilePath() + "/" + fileName,  'w')
-              data.write(out)
-              out.close()
+                        if type(setting["value"]) == bool:
+                            ini_files[setting["file"]].set(sectionkey,  settingkey,  '1' if setting["value"] else '0')
+                        else:
+                            ini_files[setting["file"]].set(sectionkey,  settingkey,  str(setting["value"]))
+                        setting["saved"] = setting["value"]
+            for fileName,  data in ini_files.iteritems():
+                out = open(self.__organizer.profilePath() + "/" + fileName,  'w')
+                data.write(out)
+                out.close()
         except Exception, e:
             print e
 
