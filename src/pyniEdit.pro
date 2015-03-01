@@ -39,8 +39,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
   QMAKE_POST_LINK += $${PYTHONPATH}/pyuic5 -x $$quote($$PWD/pyCfgDialog.ui) -o $$quote($$PWD/pyCfgDialog.py) $$escape_expand(\\n)
   QMAKE_POST_LINK += $${PYTHONPATH}/pyrcc5 -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
 } else {
-  QMAKE_POST_LINK += $${PYTHONPATH}/pyuic4 -x $$quote($$PWD/pyCfgDialog.ui) -o $$quote($$PWD/pyCfgDialog.py) $$escape_expand(\\n)
-  QMAKE_POST_LINK += $${PYTHONPATH}/pyrcc4 -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
+  QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt4\\pyuic4) -x $$quote($$PWD\\pyCfgDialog.ui) -o $$quote($$PWD\\pyCfgDialog.py) $$escape_expand(\\n)
+  QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt4\\pyrcc4) -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
 }
 QMAKE_POST_LINK += copy $$quote($$WINPWD\\pyCfg.py) $$quote($$DSTDIR\\plugins) $$escape_expand(\\n)
 QMAKE_POST_LINK += xcopy /y /s /I $$quote($$WINPWD\\pyCfgDialog.py) $$quote($$DSTDIR\\plugins\\data\\) $$escape_expand(\\n)
