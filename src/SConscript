@@ -1,0 +1,22 @@
+import os
+
+Import('qt_env')
+
+env = qt_env.Clone()
+
+# If we do more of this, these need to be tools!
+
+pyqt_path = os.path.join('${PYTHONPATH}', 'Lib', 'site-packages',
+                                                      'PyQt${QT_MAJOR_VERSION}')
+ui = env.Command('pyCfgDialog.py', 'pyCfgDialog.ui',
+                 os.path.join(pyqt_path, 'pyuic${QT_MAJOR_VERSION}') +
+                                                       ' -o $TARGET -x $SOURCE')
+rc = env.Command('pyCfgResource_rc.py', 'pyCfgResource.qrc',
+                 os.path.join(pyqt_path, 'pyrcc${QT_MAJOR_VERSION}') +
+                                                          ' -o $TARGET $SOURCE')
+
+env.Pseudo('install')
+env.Depends('install',
+            (env.Install('${PLUGIN_PATH}', 'pyCfg.py'),
+             env.Install(os.path.join('${PLUGIN_PATH}', 'data'),
+                         ( ui, rc, 'settings.json' ))))

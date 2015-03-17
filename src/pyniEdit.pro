@@ -1,5 +1,6 @@
 OTHER_FILES += \
-    pyCfg.py
+    pyCfg.py\
+    settings.json
 
 include(../plugin_template.pri)
 
@@ -34,3 +35,6 @@ QMAKE_POST_LINK += copy $$quote($$WINPWD\\settings.json) $$quote($$DSTDIR\\plugi
 
 RESOURCES += \
     pyCfgResource.qrc
+
+OTHER_FILES +=\
+    SConscript
