@@ -5,6 +5,7 @@ Import('qt_env')
 env = qt_env.Clone()
 
 # If we do more of this, these need to be tools!
+# Fortunately, although we don't use any of the qt modules, we don't care.
 
 pyqt_path = os.path.join('${PYTHONPATH}', 'Lib', 'site-packages',
                                                       'PyQt${QT_MAJOR_VERSION}')
@@ -17,6 +18,6 @@ rc = env.Command('pyCfgResource_rc.py', 'pyCfgResource.qrc',
 
 env.Pseudo('install')
 env.Depends('install',
-            (env.Install('${PLUGIN_PATH}', 'pyCfg.py'),
-             env.Install(os.path.join('${PLUGIN_PATH}', 'data'),
+            (env.Install('${INSTALL_PATH}', 'pyCfg.py'),
+             env.Install(os.path.join('${INSTALL_PATH}', 'data'),
                          ( ui, rc, 'settings.json' ))))
