@@ -37,8 +37,8 @@ DSTDIR ~= s,/,$$QMAKE_DIR_SEP,g
 WINPWD ~= s,/,$$QMAKE_DIR_SEP,g
 
 greaterThan(QT_MAJOR_VERSION, 4) {
-  QMAKE_POST_LINK += $${PYTHONPATH}\\Lib\\site-packages\\PyQt5\\pyuic5 -x $$quote($$PWD/pyCfgDialog.ui) -o $$quote($$PWD/pyCfgDialog.py) $$escape_expand(\\n)
-  QMAKE_POST_LINK += $${PYTHONPATH}\\Lib\\site-packages\\PyQt5\\pyrcc5 -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
+  QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt5\\uic) -x $$quote($$PWD/pyCfgDialog.ui) -o $$quote($$PWD/pyCfgDialog.py) $$escape_expand(\\n)
+  QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt5\\rcc) -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
 } else {
   QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt4\\pyuic4) -x $$quote($$PWD\\pyCfgDialog.ui) -o $$quote($$PWD\\pyCfgDialog.py) $$escape_expand(\\n)
   QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt4\\pyrcc4) -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
