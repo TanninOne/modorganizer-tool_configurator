@@ -10,11 +10,9 @@ env = qt_env.Clone()
 pyqt_path = os.path.join('${PYTHONPATH}', 'Lib', 'site-packages',
                                                       'PyQt${QT_MAJOR_VERSION}')
 ui = env.Command('pyCfgDialog.py', 'pyCfgDialog.ui',
-                 os.path.join(pyqt_path, 'pyuic${QT_MAJOR_VERSION}') +
-                                                       ' -o $TARGET -x $SOURCE')
+                 os.path.join(pyqt_path, 'uic') + ' -o $TARGET $SOURCE')
 rc = env.Command('pyCfgResource_rc.py', 'pyCfgResource.qrc',
-                 os.path.join(pyqt_path, 'pyrcc${QT_MAJOR_VERSION}') +
-                                                          ' -o $TARGET $SOURCE')
+                 os.path.join(pyqt_path, 'rcc') + ' -o $TARGET $SOURCE')
 
 env.Pseudo('install')
 env.Depends('install',
