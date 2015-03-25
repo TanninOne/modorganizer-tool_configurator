@@ -36,7 +36,7 @@ WINPWD = $$PWD
 DSTDIR ~= s,/,$$QMAKE_DIR_SEP,g
 WINPWD ~= s,/,$$QMAKE_DIR_SEP,g
 
-# Warning. If you *build* pytp, you get your files in one place. If you
+# Warning. If you *build* pyqt, you get your files in one place. If you
 # install it you get them in another...
 greaterThan(QT_MAJOR_VERSION, 4) {
   QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\pyuic5) $$quote($$PWD/pyCfgDialog.ui) -o $$quote($$PWD/pyCfgDialog.py) $$escape_expand(\\n)
