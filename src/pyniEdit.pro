@@ -1,6 +1,7 @@
-OTHER_FILES += \
-    pyCfg.py\
-    settings.json
+#OTHER_FILES += \
+#    pyCfg.py
+
+TARGET = dummy
 
 include(../plugin_template.pri)
 
@@ -10,6 +11,19 @@ FORMS += \
 SOURCES += \
     dummy.cpp
 
+OTHER_FILES += \
+    pyCfg.py
+
+TRANSLATIONS = $${TARGET}_en.ts \
+               $${TARGET}_de.ts \
+               $${TARGET}_es.ts \
+               $${TARGET}_fr.ts \
+               $${TARGET}_zh_TW.ts \
+               $${TARGET}_zh_CN.ts \
+               $${TARGET}_cs.ts \
+               $${TARGET}_tr.ts \
+               $${TARGET}_ko.ts \
+               $${TARGET}_ru.ts
 
 CONFIG(debug, debug|release) {
   DSTDIR = $$PWD/../../../outputd

@@ -672,7 +672,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+        "both"
       ],
       "step":0.1,
       "range":{
@@ -688,7 +689,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+        "both"
       ],
       "step":0.1,
       "range":{
@@ -704,7 +706,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+        "both"
       ],
       "step":0.1,
       "range":{
@@ -720,7 +723,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+        "both"
       ],
       "step":0.1,
       "range":{
@@ -736,7 +740,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "fVal5":{
@@ -746,7 +751,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "fVal6":{
@@ -756,7 +762,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "fVal7":{
@@ -766,7 +773,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID0":{
@@ -776,7 +784,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID1":{
@@ -786,7 +795,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID2":{
@@ -796,7 +806,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID3":{
@@ -806,7 +817,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID4":{
@@ -816,7 +828,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID5":{
@@ -826,7 +839,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID6":{
@@ -836,7 +850,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     },
     "uID7":{
@@ -846,7 +861,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ]
     }
   },
@@ -941,6 +957,29 @@
     },
     "uQuadraticMethod":{
       "default":2
+    }
+  },
+  "BlurShader":{
+    "bUseBlurShader":{
+      "default":false,
+      "flags":[
+        "prefs"
+      ],
+      "games":[
+        "oblivion"
+      ],
+      "description":"Enables a blur effect when HDR is disabled. Please note: This is read by the skyrim launcher but not by skyrim itself."
+    }
+  },
+  "BlurShaderHDR":{
+    "bDoHighDynamicRange": {
+      "default":false,
+      "flags":[
+        "prefs"
+      ],
+      "games":[
+        "oblivion"
+      ]
     }
   },
   "BSPathing":{
@@ -2688,7 +2727,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+		"both"
       ],
       "description":"if true, draw dynamic shadows from landmass like rocks"
     },
@@ -2827,7 +2867,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+        "both"
       ],
       "description":"If true, trees receive shadows."
     },
@@ -3097,7 +3138,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+		"both"
       ],
       "description":"Range at which shadows are drawn. The higher this value the lower the quality of shadows."
     },
@@ -3176,7 +3218,9 @@
         "skyrim"
       ],
       "flags":[
-        "basic"
+        "basic",
+		"prefs",
+		"both"
       ],
       "description":"Distance up to which higher detail trees are displayed"
     },
@@ -3199,7 +3243,8 @@
       ],
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+		"both"
       ],
       "range":{
         "lower":0,
@@ -3305,7 +3350,8 @@
       "default":1024,
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+        "both"
       ],
       "description":"Texture size of shadow maps. Higher value means nicer shadows but more VRAM usage and less FPS.",
       "values":[
@@ -3323,9 +3369,10 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ],
-      "description":"Supposed to control shadow map resoluton. This is NOT used in Skyrim, not sure if other games use it",
+      "description":"Supposed to control shadow map resolution. This is NOT used in Skyrim, not sure if other games use it",
       "values":[
         512,
         1024,
@@ -3341,7 +3388,8 @@
       ],
       "flags":[
         "hidden",
-        "prefs"
+        "prefs",
+        "both"
       ],
       "description":"Supposed to control shadow map resoluton. This is NOT used in Skyrim, not sure if other games use it",
       "values":[
@@ -3438,6 +3486,14 @@
       "games":[
         "skyrim"
       ]
+    },
+    "sD3DDevice":{
+      "default":"",
+      "description":"Identifier for your video card. Only relevant to the launcher",
+	  "flags":[
+		"prefs",
+		"readonly"
+	  ]
     }
   },
   "FaceGen":{
@@ -4392,7 +4448,8 @@
       "default":true,
       "flags":[
         "basic",
-        "prefs"
+        "prefs",
+		"both"
       ],
       "description":"Controls depth of field effect on various menu screens."
     },
@@ -5846,6 +5903,30 @@
       "default":"Dirt02_N.dds"
     }
   },
+  "Launcher":{
+    "bEnableFileSelection":{
+      "default":false,
+      "flags":[
+        "prefs"
+      ],
+      "games":[
+        "skyrim"
+      ],
+      "description":"Only used by launcher"
+    },
+    "bShowAllResolutions":{
+      "default": false,
+	  "flags": [
+		"prefs"
+	  ]
+    },
+    "uLastAspectRatio":{
+      "default": 0,
+	  "flags": [
+		"prefs"
+	  ]
+    }
+  },
   "Light":{
     "fLightEnableDisableFadeTime":{
       "default":1.0,
@@ -6044,7 +6125,11 @@
       "default":1.0,
       "games":[
         "skyrim"
-      ]
+      ],
+	  "flags": [
+		"prefs",
+		"both"
+	  ]
     },
     "fLODFadeOutObjectMultCity":{
       "default":1.0
@@ -6716,7 +6801,9 @@
         "skyrim"
       ],
       "flags":[
-        "basic"
+        "basic",
+		"prefs",
+		"both"
       ],
       "range":{
         "lower":0,
@@ -7477,7 +7564,11 @@
       "default":15.0,
       "games":[
         "skyrim"
-      ]
+      ],
+	  "flags": [
+		"prefs",
+		"both"
+	  ]
     },
     "iAutoSaveCount":{
       "default":3,
@@ -7966,10 +8057,18 @@
       "default":true
     },
     "bUseWaterDepth":{
-      "default":true
+      "default":true,
+	  "flags": [
+		"prefs",
+		"both"
+	  ]
     },
     "bUseWaterDisplacements":{
-      "default":true
+      "default":true,
+	  "flags": [
+		"prefs",
+		"both"
+	  ]
     },
     "bUseWaterHiRes":{
       "default":false
@@ -7981,10 +8080,18 @@
       "default":false
     },
     "bUseWaterReflections":{
-      "default":true
+      "default":true,
+	  "flags": [
+		"prefs",
+		"both"
+	  ]
     },
     "bUseWaterRefractions":{
-      "default":true
+      "default":true,
+	  "flags": [
+		"prefs",
+		"both"
+	  ]
     },
     "bUseWaterShader":{
       "default":true
@@ -8028,7 +8135,9 @@
     "iWaterReflectHeight":{
       "default":512,
       "flags":[
-        "basic"
+        "basic",
+		"prefs",
+		"both"
       ],
       "values":[
         128,
@@ -8044,7 +8153,9 @@
     "iWaterReflectWidth":{
       "default":512,
       "flags":[
-        "basic"
+        "basic",
+		"prefs",
+		"both"
       ],
       "values":[
         128,
