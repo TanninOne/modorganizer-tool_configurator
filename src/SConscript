@@ -39,16 +39,3 @@ if env['QT_MAJOR_VERSION'] > 4:
                         '__init__.py' ]
                     )
         )
-    if env['CONFIG'] == 'debug' and env['QT_MAJOR_VERSION'] > 4:
-        # pyqt5 is built in non-debug mode and links with the non-debug QT DLLs.
-        # Unfortunately, if you try using both the debug and non-debug DLLS,
-        # then Bad Things Happen (TM). So we copy the debug ones and give them
-        # the non debug names.
-        prefix = 'QT%d' % env['QT_MAJOR_VERSION']
-        suffix = 'd'
-        for lib in ('Core', 'Gui', 'Widgets'):
-            env.Depends('install',
-                env.InstallAs(os.path.join('${INSTALL_PATH}', '..', 'DLLs',
-                                                         prefix + lib + '.dll'),
-                              os.path.join(env['QTDIR'], 'bin',
-                                               prefix + lib + suffix + '.dll')))
