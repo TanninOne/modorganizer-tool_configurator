@@ -6,18 +6,36 @@ env = qt_env.Clone()
 
 # If we do more of this, these need to be tools!
 # Fortunately, although we don't use any of the qt modules, we don't care.
+# A note: if you *build* pyqt, you get files in one place. If you use the
+# provided installers, you get it somewhere else...
+env['ENV']['PATH'] = '%s;%s' % (os.path.join(env['QTDIR'], 'bin'),
+                                env['ENV']['PATH'])
 
-pyqt_path = os.path.join('${PYTHONPATH}', 'Lib', 'site-packages',
-                                                      'PyQt${QT_MAJOR_VERSION}')
 ui = env.Command('pyCfgDialog.py', 'pyCfgDialog.ui',
-                 os.path.join(pyqt_path, 'pyuic${QT_MAJOR_VERSION}') +
-                                                       ' -o $TARGET -x $SOURCE')
-rc = env.Command('pyCfgResource_rc.py', 'pyCfgResource.qrc',
-                 os.path.join(pyqt_path, 'pyrcc${QT_MAJOR_VERSION}') +
+                 os.path.join('${PYTHONPATH}',
+                              'pyuic%d' % env['QT_MAJOR_VERSION']) +
                                                           ' -o $TARGET $SOURCE')
+rc = env.Command('pyCfgResource_rc.py', 'pyCfgResource.qrc',
+                 os.path.join('${PYTHONPATH}',
+                              'pyrcc%d' % env['QT_MAJOR_VERSION']) +
+                                                          ' -o $TARGET $SOURCE')
+
+init = env.Command('__init__.py', None, Touch('$TARGET'))
 
 env.Pseudo('install')
 env.Depends('install',
             (env.Install('${INSTALL_PATH}', 'pyCfg.py'),
              env.Install(os.path.join('${INSTALL_PATH}', 'data'),
-                         ( ui, rc, 'settings.json' ))))
+                         ( ui, rc, 'settings.json' )),
+             ))
+
+if env['QT_MAJOR_VERSION'] > 4:
+    pyqt = 'PyQt%d' % env['QT_MAJOR_VERSION']
+    pqtdir = os.path.join('${PYTHONPATH}', 'Lib', 'site-packages', pyqt)
+    env.Depends('install',
+        env.Install(os.path.join('${INSTALL_PATH}', 'data', pyqt),
+                    [ os.path.join(pqtdir, 'Qt%s.pyd' % lib)
+                                     for lib in ('Core', 'Gui', 'Widgets') ] + [
+                        '__init__.py' ]
+                    )
+        )

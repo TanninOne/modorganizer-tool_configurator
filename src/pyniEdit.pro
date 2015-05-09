@@ -12,7 +12,8 @@ SOURCES += \
     dummy.cpp
 
 OTHER_FILES += \
-    pyCfg.py
+    pyCfg.py\
+    settings.json
 
 TRANSLATIONS = $${TARGET}_en.ts \
                $${TARGET}_de.ts \
@@ -35,9 +36,11 @@ WINPWD = $$PWD
 DSTDIR ~= s,/,$$QMAKE_DIR_SEP,g
 WINPWD ~= s,/,$$QMAKE_DIR_SEP,g
 
+# Warning. If you *build* pyqt, you get your files in one place. If you
+# install it you get them in another...
 greaterThan(QT_MAJOR_VERSION, 4) {
-  QMAKE_POST_LINK += $${PYTHONPATH}/pyuic5 -x $$quote($$PWD/pyCfgDialog.ui) -o $$quote($$PWD/pyCfgDialog.py) $$escape_expand(\\n)
-  QMAKE_POST_LINK += $${PYTHONPATH}/pyrcc5 -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
+  QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\pyuic5) $$quote($$PWD/pyCfgDialog.ui) -o $$quote($$PWD/pyCfgDialog.py) $$escape_expand(\\n)
+  QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\pyrcc5) -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
 } else {
   QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt4\\pyuic4) -x $$quote($$PWD\\pyCfgDialog.ui) -o $$quote($$PWD\\pyCfgDialog.py) $$escape_expand(\\n)
   QMAKE_POST_LINK += $$quote($${PYTHONPATH}\\Lib\\site-packages\\PyQt4\\pyrcc4) -o $$quote($$PWD/pyCfgResource_rc.py) $$quote($$PWD/pyCfgResource.qrc) $$escape_expand(\\n)
