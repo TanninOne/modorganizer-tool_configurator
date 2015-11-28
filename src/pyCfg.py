@@ -110,8 +110,8 @@ class MainWindow(QDialog):
                 self.__save()
             elif res == QMessageBox.Cancel:
                 event.ignore()
-        else:
-            super(MainWindow,  self).__init__(event)
+        #else:
+        #    super(MainWindow,  self).__init__(event)
 
     def __save(self):
         self.saveSettings.emit(self.__settings)
@@ -437,6 +437,8 @@ class IniEdit(mobase.IPluginTool):
             return ["fallout.ini",  "falloutprefs.ini"]
         elif str(gameType) == "skyrim":
             return ["skyrim.ini",  "skyrimprefs.ini"]
+        elif str(gameType) == "fallout4":
+            return ["fallout4.ini", "fallout4prefs.ini", "fallout4custom.ini"]
         else:
             return []
 
@@ -466,7 +468,10 @@ class IniEdit(mobase.IPluginTool):
     def updateSettings(self, settings, fileName):
         parser = ConfigParser.SafeConfigParser(allow_no_value=True)
         parser.optionxform = str
-        cfgFile = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
+        filePath = self.__organizer.profilePath() + "/" + fileName
+        if not os.path.exists(filePath):
+            return
+        cfgFile = MagicFile(filePath, 'r')
         parser.readfp(cfgFile)
         for section in parser.sections():
             if section not in settings:
@@ -518,12 +523,14 @@ class IniEdit(mobase.IPluginTool):
         try:
             ini_files = {}
             for fileName in self.__iniFiles():
-                parser = ConfigParser.SafeConfigParser(allow_no_value=True)
-                parser.optionxform = str
-                cfgFile = MagicFile(self.__organizer.profilePath() + "/" + fileName, 'r')
-                parser.readfp(cfgFile)
-                ini_files[fileName] = parser
-                cfgFile.close()
+                filePath = self.__organizer.profilePath() + "/" + fileName
+                if os.path.exists(filePath):
+                    parser = ConfigParser.SafeConfigParser(allow_no_value=True)
+                    parser.optionxform = str
+                    cfgFile = MagicFile(filePath, 'r')
+                    parser.readfp(cfgFile)
+                    ini_files[fileName] = parser
+                    cfgFile.close()
             count = 0
             for sectionkey, section in settings.iteritems():
                 count += 1
@@ -539,10 +546,12 @@ class IniEdit(mobase.IPluginTool):
                         else:
                             ini_files[setting["file"]].set(sectionkey,  settingkey,  str(setting["value"]))
                         setting["saved"] = setting["value"]
-            for fileName,  data in ini_files.iteritems():
-                out = open(self.__organizer.profilePath() + "/" + fileName,  'w')
-                data.write(out)
-                out.close()
+            for fileName, data in ini_files.iteritems():
+                filePath = self.__organizer.profilePath() + "/" + fileName
+                if os.path.exists(filePath):
+                    out = open(filePath, 'w')
+                    data.write(out)
+                    out.close()
         except Exception, e:
             print e
 

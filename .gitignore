@@ -1,1 +1,4 @@
-Thumbs.db
+build
+std*.log
+CMakeLists.txt.user
+edit
