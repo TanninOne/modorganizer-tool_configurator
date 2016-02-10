@@ -435,11 +435,9 @@ class IniEdit(mobase.IPluginTool):
         elif gameName == "fallout3" or gameName == "falloutnv":
             return ["fallout.ini",  "falloutprefs.ini"]
         elif gameName == "fallout4":
-            return ["fallout4.ini",  "fallout4prefs.ini"]
+            return ["fallout4.ini",  "fallout4prefs.ini", "fallout4custom.ini"]
         elif gameName == "skyrim":
             return ["skyrim.ini",  "skyrimprefs.ini"]
-        elif str(gameType) == "fallout4":
-            return ["fallout4.ini", "fallout4prefs.ini", "fallout4custom.ini"]
         else:
             return []
 
