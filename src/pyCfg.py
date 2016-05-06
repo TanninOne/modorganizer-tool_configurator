@@ -467,7 +467,14 @@ class IniEdit(mobase.IPluginTool):
     def updateSettings(self, settings, fileName):
         parser = ConfigParser.SafeConfigParser(allow_no_value=True)
         parser.optionxform = str
-        filePath = self.__organizer.profilePath() + "/" + fileName
+
+        profile = self.__organizer.profile()
+        if profile.localSettingsEnabled():
+            base_path = profile.absolutePath()
+        else:
+            base_path = self.__organizer.managedGame().documentsDirectory().absolutePath()
+
+        filePath = base_path + "/" + fileName
         if not os.path.exists(filePath):
             return
         cfgFile = MagicFile(filePath, 'r')
@@ -521,8 +528,15 @@ class IniEdit(mobase.IPluginTool):
     def __save(self,  settings):
         try:
             ini_files = {}
+
+            profile = self.__organizer.profile()
+            if profile.localSettingsEnabled():
+                base_path = profile.absolutePath()
+            else:
+                base_path = self.__organizer.managedGame().documentsDirectory().absolutePath()
+
             for fileName in self.__iniFiles():
-                filePath = self.__organizer.profilePath() + "/" + fileName
+                filePath = base_path + "/" + fileName
                 if os.path.exists(filePath):
                     parser = ConfigParser.SafeConfigParser(allow_no_value=True)
                     parser.optionxform = str
@@ -546,7 +560,7 @@ class IniEdit(mobase.IPluginTool):
                             ini_files[setting["file"]].set(sectionkey,  settingkey,  str(setting["value"]))
                         setting["saved"] = setting["value"]
             for fileName, data in ini_files.iteritems():
-                filePath = self.__organizer.profilePath() + "/" + fileName
+                filePath = base_path + "/" + fileName
                 if os.path.exists(filePath):
                     out = open(filePath, 'w')
                     data.write(out)
