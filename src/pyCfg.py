@@ -438,6 +438,8 @@ class IniEdit(mobase.IPluginTool):
             return ["fallout4.ini",  "fallout4prefs.ini", "fallout4custom.ini"]
         elif gameName == "skyrim":
             return ["skyrim.ini",  "skyrimprefs.ini"]
+        elif gameName == "skyrimse":
+            return ["skyrim.ini",  "skyrimprefs.ini"]
         else:
             return []
 
